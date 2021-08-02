@@ -14,6 +14,7 @@ class MyGame extends Phaser.Scene {
     const radius = 100;
     const { width, height } = this.scale.gameSize;
     const circle = this.add.circle(width / 2, height / 2, radius, 0xffffff);
+    //circle.setData('dragged', false);
     circle.setStrokeStyle(strokeWidth);
     circle.strokeColor = 0xff0000;
     circle.isStroked = false;
@@ -22,6 +23,8 @@ class MyGame extends Phaser.Scene {
     circle.on(
       'pointerup',
       () => {
+        console.log('pointerup');
+        if (circle.getData('dragged')) return;
         const newColor = Phaser.Display.Color.RandomRGB();
         circle.fillColor = newColor.color;
         circle.strokeColor = newColor.saturate(100).lighten(100).color;
@@ -33,6 +36,16 @@ class MyGame extends Phaser.Scene {
     });
     circle.on('pointerout', () => {
       circle.isStroked = false;
+    });
+
+    this.input.setDraggable(circle);
+    this.input.on('drag', (p, obj, dragX, dragY) => {
+      obj.x = dragX;
+      obj.y = dragY;
+      obj.setData('dragged', true);
+    });
+    this.input.on('dragstart', (p, obj) => {
+      obj.setData('dragged', false);
     });
   }
 }
