@@ -14,7 +14,6 @@ class MyGame extends Phaser.Scene {
     const radius = 100;
     const { width, height } = this.scale.gameSize;
     const circle = this.add.circle(width / 2, height / 2, radius, 0xffffff);
-    //circle.setData('dragged', false);
     circle.setStrokeStyle(strokeWidth);
     circle.strokeColor = 0xff0000;
     circle.isStroked = false;
