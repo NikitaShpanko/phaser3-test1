@@ -1,32 +1,37 @@
 import Phaser from 'phaser';
-
-const STROKE_WIDTH = 5;
+// area:
+const WIDTH = 800;
+const HEIGHT = 600;
+// circle:
 const RADIUS = 100;
-const FRICTION_AIR = 0.05;
-const BOUNCE = 0.7;
+const STROKE_WIDTH = 5;
 const INIT_FILL_COLOR = 0xffffff;
 const INIT_STROKE_COLOR = 0xff0000;
+// physics:
+const FRICTION_AIR = 0.05;
+const BOUNCE = 0.7;
+const GRAVITY = { x: 0, y: 0 };
 
 class MyGame extends Phaser.Scene {
   constructor() {
     super({
       physics: {
         default: 'matter',
-        matter: {},
+        matter: {
+          setBounds: { x: 0, y: 0, width: WIDTH, height: HEIGHT, thickness: WIDTH + HEIGHT },
+          gravity: { ...GRAVITY },
+        },
       },
     });
   }
 
   create() {
-    const { width, height } = this.scale.gameSize;
     const circle = this.matter.add.gameObject(
-      this.add.circle(width / 2, height / 2, RADIUS, INIT_FILL_COLOR),
-      {
-        circleRadius: RADIUS,
-        frictionAir: FRICTION_AIR,
-      },
+      this.add.circle(WIDTH / 2, HEIGHT / 2, RADIUS, INIT_FILL_COLOR),
+      { frictionAir: FRICTION_AIR },
       false,
     );
+    circle.setCircle(RADIUS, RADIUS, RADIUS);
 
     circle.setStrokeStyle(STROKE_WIDTH);
     circle.strokeColor = INIT_STROKE_COLOR;
@@ -57,8 +62,6 @@ class MyGame extends Phaser.Scene {
     });
 
     this.input.setDraggable(circle);
-    this.matter.world.disableGravity();
-    this.matter.world.setBounds(0, 0, width, height, width + height);
     circle.setBounce(BOUNCE);
 
     this.input.on('drag', (p, obj, dragX, dragY) => {
@@ -76,9 +79,8 @@ class MyGame extends Phaser.Scene {
 const config = {
   type: Phaser.AUTO,
   parent: 'phaser-example',
-  width: 800,
-  height: 600,
+  width: WIDTH,
+  height: HEIGHT,
   scene: MyGame,
 };
 const game = new Phaser.Game(config);
-console.log(game.scene);
