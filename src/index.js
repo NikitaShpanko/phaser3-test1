@@ -2,7 +2,14 @@ import Phaser from 'phaser';
 
 class MyGame extends Phaser.Scene {
   constructor() {
-    super();
+    super({
+      physics: {
+        default: 'arcade',
+        arcade: {
+          /*gravity: { y: 1000 }*/
+        },
+      },
+    });
   }
 
   preload() {
@@ -13,7 +20,11 @@ class MyGame extends Phaser.Scene {
     const strokeWidth = 5;
     const radius = 100;
     const { width, height } = this.scale.gameSize;
-    const circle = this.add.circle(width / 2, height / 2, radius, 0xffffff);
+    const circle = this.physics.add.existing(
+      this.add.circle(width / 2, height / 2, radius, 0xffffff),
+    );
+    circle.body.setBounce(1, 1);
+    circle.body.setCollideWorldBounds(true);
     circle.setStrokeStyle(strokeWidth);
     circle.strokeColor = 0xff0000;
     circle.isStroked = false;
@@ -22,7 +33,6 @@ class MyGame extends Phaser.Scene {
     circle.on(
       'pointerup',
       () => {
-        console.log('pointerup');
         if (circle.getData('dragged')) return;
         const newColor = Phaser.Display.Color.RandomRGB();
         circle.fillColor = newColor.color;
@@ -39,6 +49,7 @@ class MyGame extends Phaser.Scene {
 
     this.input.setDraggable(circle);
     this.input.on('drag', (p, obj, dragX, dragY) => {
+      //if(!obj.body) return;
       obj.x = dragX;
       obj.y = dragY;
       obj.setData('dragged', true);
