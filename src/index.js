@@ -1,9 +1,9 @@
 import Phaser from 'phaser';
 
-const strokeWidth = 5;
-const radius = 100;
-const frictionAir = 0.2;
-const bounce = 0.7;
+const STROKE_WIDTH = 5;
+const RADIUS = 100;
+const FRICTION_AIR = 0.05;
+const BOUNCE = 0.7;
 
 let circle;
 class MyGame extends Phaser.Scene {
@@ -22,14 +22,23 @@ class MyGame extends Phaser.Scene {
 
   create() {
     const { width, height } = this.scale.gameSize;
-    circle = this.add.circle(width / 2, height / 2, radius, 0xffffff);
+    circle = this.matter.add.gameObject(
+      this.add.circle(width / 2, height / 2, RADIUS, 0xffffff),
+      {
+        circleRadius: RADIUS,
+        frictionAir: FRICTION_AIR,
+      },
+      false,
+    );
 
-    circle.setStrokeStyle(strokeWidth);
+    circle.setStrokeStyle(STROKE_WIDTH);
     circle.strokeColor = 0xff0000;
     circle.isStroked = false;
-    const shape = new Phaser.Geom.Circle(radius, radius, radius);
 
-    circle.setInteractive(shape, Phaser.Geom.Circle.Contains);
+    circle.setInteractive(
+      new Phaser.Geom.Circle(RADIUS, RADIUS, RADIUS),
+      Phaser.Geom.Circle.Contains,
+    );
 
     circle.on(
       'pointerup',
@@ -51,27 +60,14 @@ class MyGame extends Phaser.Scene {
     });
 
     this.input.setDraggable(circle);
-
     this.matter.world.disableGravity();
-    this.matter.world.setBounds(0, 0, width, height, 32);
-    const circlePhysics = this.matter.add.gameObject(
-      circle,
-      {
-        circleRadius: radius,
-        frictionAir: frictionAir,
-      },
-      false,
-    );
-    circlePhysics.setBounce(bounce);
-
-    //circlePhysics.setCollidesWith()
-    //circlePhysics.setFrictionAir(0.05);
-    // circlePhysics.setDensity()
+    this.matter.world.setBounds(0, 0, width, height, width + height);
+    circle.setBounce(BOUNCE);
+    // circle.setOnCollide(data => console.log(data));
 
     this.input.on('drag', (p, obj, dragX, dragY) => {
-      //if (!obj.body) return;
       if (obj !== circle) return;
-      circlePhysics.setVelocity(dragX - obj.x, dragY - obj.y);
+      circle.setVelocity(dragX - obj.x, dragY - obj.y);
       obj.setData('dragged', true);
     });
 
@@ -82,9 +78,6 @@ class MyGame extends Phaser.Scene {
 
   update(time, delta) {
     const { width, height } = this.scale.gameSize;
-    //console.log(time);
-    //if (time % 10) return;
-    //console.log(circle.x, circle.y);
     if (circle.x < 0 || circle.x > width || circle.y < 0 || circle.y > height) {
       console.log(circle.x, circle.y);
       circle.x = width / 2;
