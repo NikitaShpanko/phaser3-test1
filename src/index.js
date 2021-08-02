@@ -1,13 +1,13 @@
 import Phaser from 'phaser';
 
+const SPEED_FACTOR = 1;
+
 class MyGame extends Phaser.Scene {
   constructor() {
     super({
       physics: {
         default: 'arcade',
-        arcade: {
-          /*gravity: { y: 1000 }*/
-        },
+        arcade: {},
       },
     });
   }
@@ -24,12 +24,16 @@ class MyGame extends Phaser.Scene {
       this.add.circle(width / 2, height / 2, radius, 0xffffff),
     );
     circle.body.setBounce(1, 1);
+    //circle.body.setDamping(true);
     circle.body.setCollideWorldBounds(true);
+
     circle.setStrokeStyle(strokeWidth);
     circle.strokeColor = 0xff0000;
     circle.isStroked = false;
     const shape = new Phaser.Geom.Circle(radius, radius, radius);
+
     circle.setInteractive(shape, Phaser.Geom.Circle.Contains);
+
     circle.on(
       'pointerup',
       () => {
@@ -37,23 +41,27 @@ class MyGame extends Phaser.Scene {
         const newColor = Phaser.Display.Color.RandomRGB();
         circle.fillColor = newColor.color;
         circle.strokeColor = newColor.saturate(100).lighten(100).color;
+        circle.body.setVelocity(0, 0);
       },
       this,
     );
+
     circle.on('pointerover', () => {
       circle.isStroked = true;
     });
+
     circle.on('pointerout', () => {
       circle.isStroked = false;
     });
 
     this.input.setDraggable(circle);
+
     this.input.on('drag', (p, obj, dragX, dragY) => {
-      //if(!obj.body) return;
-      obj.x = dragX;
-      obj.y = dragY;
+      if (!obj.body) return;
+      circle.body.setVelocity((dragX - obj.x) * SPEED_FACTOR, (dragY - obj.y) * SPEED_FACTOR);
       obj.setData('dragged', true);
     });
+
     this.input.on('dragstart', (p, obj) => {
       obj.setData('dragged', false);
     });
