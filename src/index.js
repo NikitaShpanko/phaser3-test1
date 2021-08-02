@@ -4,8 +4,9 @@ const STROKE_WIDTH = 5;
 const RADIUS = 100;
 const FRICTION_AIR = 0.05;
 const BOUNCE = 0.7;
+const INIT_FILL_COLOR = 0xffffff;
+const INIT_STROKE_COLOR = 0xff0000;
 
-let circle;
 class MyGame extends Phaser.Scene {
   constructor() {
     super({
@@ -16,14 +17,10 @@ class MyGame extends Phaser.Scene {
     });
   }
 
-  preload() {
-    //this.load.image()
-  }
-
   create() {
     const { width, height } = this.scale.gameSize;
-    circle = this.matter.add.gameObject(
-      this.add.circle(width / 2, height / 2, RADIUS, 0xffffff),
+    const circle = this.matter.add.gameObject(
+      this.add.circle(width / 2, height / 2, RADIUS, INIT_FILL_COLOR),
       {
         circleRadius: RADIUS,
         frictionAir: FRICTION_AIR,
@@ -32,7 +29,7 @@ class MyGame extends Phaser.Scene {
     );
 
     circle.setStrokeStyle(STROKE_WIDTH);
-    circle.strokeColor = 0xff0000;
+    circle.strokeColor = INIT_STROKE_COLOR;
     circle.isStroked = false;
 
     circle.setInteractive(
@@ -63,7 +60,6 @@ class MyGame extends Phaser.Scene {
     this.matter.world.disableGravity();
     this.matter.world.setBounds(0, 0, width, height, width + height);
     circle.setBounce(BOUNCE);
-    // circle.setOnCollide(data => console.log(data));
 
     this.input.on('drag', (p, obj, dragX, dragY) => {
       if (obj !== circle) return;
@@ -75,15 +71,6 @@ class MyGame extends Phaser.Scene {
       obj.setData('dragged', false);
     });
   }
-
-  update(time, delta) {
-    const { width, height } = this.scale.gameSize;
-    if (circle.x < 0 || circle.x > width || circle.y < 0 || circle.y > height) {
-      console.log(circle.x, circle.y);
-      circle.x = width / 2;
-      circle.y = height / 2;
-    }
-  }
 }
 
 const config = {
@@ -94,3 +81,4 @@ const config = {
   scene: MyGame,
 };
 const game = new Phaser.Game(config);
+console.log(game.scene);
